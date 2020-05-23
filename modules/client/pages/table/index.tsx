@@ -3,6 +3,11 @@ import * as Faker from "faker";
 import { Button, Typography, Grid } from "@material-ui/core";
 import { ITEMS_TO_LOAD_COUNT } from "client/components/table/constants";
 import { Table } from "client/components/table";
+import {
+  useQueryBundle,
+  useQueryWithPreviousResultsWhileLoading,
+} from "client/graphql/hooks";
+import { GetRows } from "client/graphql/types.gen";
 
 export type ItemType = {
   firstName: string;
@@ -27,22 +32,24 @@ export const TablePage: React.FC = () => {
     columnIndex: 0,
   });
 
+  // todo, eventually this will have to be more eleaborate
+  const [offset, setOffset] = React.useState(0);
+  // neesd to be configured to match w/ the infinite scroll limit
+  const LIMIT = 100;
+
+  const rowData = useQueryWithPreviousResultsWhileLoading(GetRows, {
+    variables: {
+      limit: LIMIT,
+      offset: offset,
+    },
+    fetchPolicy: "cache-and-network",
+  });
+
+  // use-callbackify this
   let loadMoreItems = (startIndex: number, stopIndex: number): Promise<any> => {
-    return new Promise(() =>
-      setTimeout(() => {
-        setLoadedItemsState({
-          hasNextPage: loadedItemsState.items.length < ITEMS_TO_LOAD_COUNT,
-          items: [...loadedItemsState.items].concat(
-            new Array(10).fill(true).map(() => ({
-              firstName: Faker.name.firstName(),
-              lastName: Faker.name.lastName(),
-              suffix: Faker.name.suffix(),
-              job: Faker.name.jobDescriptor(),
-            }))
-          ),
-        });
-      }, 1500)
-    );
+    console.log({ startIndex, stopIndex });
+    setOffset(stopIndex);
+    return Promise.resolve();
   };
 
   // the item is loaded if either 1) there are no more pages or 2) there exists an item at that index
@@ -60,6 +67,10 @@ export const TablePage: React.FC = () => {
   const hideTableCallback = React.useCallback(() => setShowTable(false), []);
 
   const { hasNextPage, items } = loadedItemsState;
+
+  if (rowData.state === "LOADING") {
+    return <>LOADING!</>;
+  }
 
   return showTable ? (
     <>
@@ -84,7 +95,7 @@ export const TablePage: React.FC = () => {
 
         <Table
           hasNextPage={hasNextPage}
-          items={items}
+          items={rowData.data.getRows}
           loadMoreItems={loadMoreItems}
           isItemLoaded={isItemLoaded}
           scrollState={scrollState}

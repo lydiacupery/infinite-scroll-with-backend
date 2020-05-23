@@ -1,0 +1,9 @@
+query GetRows($limit: Int!, $offset: Int!) {
+  getRows(limit: $limit, offset: $offset) {
+    id
+    firstName
+    lastName
+    suffix
+    job
+  }
+}

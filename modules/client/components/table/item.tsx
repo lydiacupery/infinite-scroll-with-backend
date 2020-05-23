@@ -25,7 +25,7 @@ export const Item: React.FunctionComponent<
     prepareRow(row);
   }
 
-  const column = row.cells[columnIndex];
+  const cell = row.cells[columnIndex];
 
-  return <div {...column.getCellProps({ style })}>{column.render("Cell")}</div>;
+  return <div {...cell.getCellProps({ style })}>{cell.render("Cell")}</div>;
 };

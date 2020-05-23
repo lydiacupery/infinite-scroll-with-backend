@@ -3,6 +3,15 @@ scalar IsoTime
 
 type Query {
   loggedInUser: User!
+  getRows(limit: Int!, offset: Int!): [Row!]!
+}
+
+type Row {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  suffix: String!
+  job: String!
 }
 
 type User {
