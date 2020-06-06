@@ -23,6 +23,7 @@ type Props = {
   };
   setScrollRowAndColumn: (rowIndex: number, columnIndex: number) => void;
   itemCount: number;
+  columnCount: number;
   itemData: ItemData;
 };
 
@@ -38,7 +39,7 @@ export const TableContent: React.FunctionComponent<Props> = props => {
   return (
     <InfiniteLoader
       isItemLoaded={isItemLoaded}
-      itemCount={100}
+      itemCount={itemCount}
       loadMoreItems={loadMoreItems}
     >
       {({ onItemsRendered, ref }) => (

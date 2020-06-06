@@ -8,6 +8,7 @@ import {
   useQueryWithPreviousResultsWhileLoading,
 } from "client/graphql/hooks";
 import { GetRows } from "client/graphql/types.gen";
+import { useRows } from "./useRows";
 
 export type ItemType = {
   firstName: string;
@@ -17,13 +18,13 @@ export type ItemType = {
 };
 
 export const TablePage: React.FC = () => {
-  const [loadedItemsState, setLoadedItemsState] = React.useState<{
-    hasNextPage: boolean;
-    items: ItemType[];
-  }>({
-    hasNextPage: true,
-    items: [],
-  });
+  // const [loadedItemsState, setLoadedItemsState] = React.useState<{
+  //   hasNextPage: boolean;
+  //   items: ItemType[];
+  // }>({
+  //   hasNextPage: true,
+  //   items: [],
+  // });
 
   const [showTable, setShowTable] = React.useState(true);
 
@@ -33,44 +34,56 @@ export const TablePage: React.FC = () => {
   });
 
   // todo, eventually this will have to be more eleaborate
-  const [offset, setOffset] = React.useState(0);
+  // const [offset, setOffset] = React.useState(0);
   // neesd to be configured to match w/ the infinite scroll limit
-  const LIMIT = 100;
+  const LIMIT = 10;
 
-  const rowData = useQueryWithPreviousResultsWhileLoading(GetRows, {
-    variables: {
-      limit: LIMIT,
-      offset: offset,
-    },
-    fetchPolicy: "cache-and-network",
-  });
+  // const rowData = useQueryWithPreviousResultsWhileLoading(GetRows, {
+  //   variables: {
+  //     limit: LIMIT,
+  //     offset: offset,
+  //   },
+  //   fetchPolicy: "cache-and-network",
+  // });
+  // console.log({ rowData });
+
+  const { rows, loading, loadMore, hasNextRow } = useRows();
 
   // use-callbackify this
-  let loadMoreItems = (startIndex: number, stopIndex: number): Promise<any> => {
-    console.log({ startIndex, stopIndex });
-    setOffset(stopIndex);
+  let loadMoreItems = async (
+    startIndex: number,
+    stopIndex: number
+  ): Promise<any> => {
+    // setOffset(stopIndex);
+    console.log({ stopIndex });
+    if (!loading && loadMore) {
+      await loadMore(stopIndex, LIMIT);
+    }
     return Promise.resolve();
   };
 
   // the item is loaded if either 1) there are no more pages or 2) there exists an item at that index
   let isItemLoaded = (index: number) =>
-    !loadedItemsState.hasNextPage || !!loadedItemsState.items[index];
+    // !loadedItemsState.hasNextPage || !!loadedItemsState.items[index];
+    !hasNextRow || !!rows[index]; // todo, account for 'has next page'
 
   const setScrollRowAndColum = React.useCallback(
     (rowIndex: number, columnIndex: number) => {
+      // console.log("row index scrolls state", rowIndex);
       setScrollState({ rowIndex, columnIndex });
     },
+
     []
   );
 
   const showTableCallback = React.useCallback(() => setShowTable(true), []);
   const hideTableCallback = React.useCallback(() => setShowTable(false), []);
 
-  const { hasNextPage, items } = loadedItemsState;
+  // const { hasNextPage, items } = loadedItemsState;
 
-  if (rowData.state === "LOADING") {
-    return <>LOADING!</>;
-  }
+  // if (rowData.state === "LOADING") {
+  //   return <>LOADING!</>;
+  // }
 
   return showTable ? (
     <>
@@ -94,8 +107,8 @@ export const TablePage: React.FC = () => {
         {/* <Box m={3} /> */}
 
         <Table
-          hasNextPage={hasNextPage}
-          items={rowData.data.getRows}
+          hasNextPage={hasNextRow} //todo, need to do next page logic
+          items={rows}
           loadMoreItems={loadMoreItems}
           isItemLoaded={isItemLoaded}
           scrollState={scrollState}

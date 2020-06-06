@@ -3,11 +3,17 @@ scalar IsoTime
 
 type Query {
   loggedInUser: User!
-  getRows(limit: Int!, offset: Int!): [Row!]!
+  getRows(limit: Int!, offset: Int!): RowChunk
+}
+
+type RowChunk {
+  rows: [Row!]!
+  hasNextRow: Boolean!
 }
 
 type Row {
   id: ID!
+  index: Int!
   firstName: String!
   lastName: String!
   suffix: String!

@@ -19,6 +19,10 @@ const columns: Column<ItemType>[] = [
         Header: "Suffix",
         accessor: "suffix",
       },
+      {
+        Header: "Index",
+        accessor: "index",
+      },
     ],
   },
   {
@@ -32,6 +36,7 @@ export type ItemType = {
   lastName: string;
   suffix: string;
   job: string;
+  index: number;
 };
 
 type Props = {
@@ -67,6 +72,7 @@ export const Table: React.FunctionComponent<Props> = props => {
     data: items,
     columns: columns,
   });
+  console.log({ rows });
 
   const itemData: ItemData = React.useMemo(
     () => ({
@@ -85,6 +91,7 @@ export const Table: React.FunctionComponent<Props> = props => {
       setScrollRowAndColumn={setScrollRowAndColumn}
       itemCount={itemCount}
       itemData={itemData}
+      columnCount={columns.length}
     />
   );
 };
