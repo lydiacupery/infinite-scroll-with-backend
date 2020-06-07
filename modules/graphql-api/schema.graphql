@@ -3,12 +3,13 @@ scalar IsoTime
 
 type Query {
   loggedInUser: User!
-  getRowPage(limit: Int!, offset: Int!): Page!
+  getRowsConnection(limit: Int!, offset: Int!): RowsConnection!
 }
 
-type Page {
+type RowsConnection {
   rows: [Row!]!
   pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 type PageInfo {

@@ -1,5 +1,5 @@
-query GetRowPage($limit: Int!, $offset: Int!) {
-  getRowPage(limit: $limit, offset: $offset) {
+query GetRowsConnection($limit: Int!, $offset: Int!) {
+  getRowsConnection(limit: $limit, offset: $offset) {
     rows {
       id
       firstName
@@ -11,5 +11,6 @@ query GetRowPage($limit: Int!, $offset: Int!) {
     pageInfo {
       hasNextRow
     }
+    totalCount
   }
 }

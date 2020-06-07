@@ -1,58 +1,68 @@
 import { useQuery } from "react-apollo-hooks";
-import { GetRowPage } from "client/graphql/types.gen";
+import { GetRowsConnection } from "client/graphql/types.gen";
 import { ApolloQueryResult } from "apollo-client";
 import { ProvidedRequiredArgumentsOnDirectives } from "graphql/validation/rules/ProvidedRequiredArguments";
 import * as immer from "immer";
 
-export function useRows():
-  | { loading: true; rows: never[]; loadMore: undefined; hasNextRow: true }
+export function useRows(args: {
+  limit: number;
+}):
+  | {
+      loading: true;
+      rows: never[];
+      loadMore: undefined;
+      hasNextRow: true;
+      totalRows: 0;
+    }
   | {
       loading: false;
       rows: any[]; // todo add the type!
-      loadMore: (
-        offset: number,
-        limit: number
-      ) => Promise<ApolloQueryResult<any>>;
+      loadMore: (offset: number) => Promise<ApolloQueryResult<any>>;
       hasNextRow: boolean;
+      totalRows: number;
     } {
-  const { data, loading, fetchMore } = useQuery(GetRowPage.Document, {
+  const { data, loading, fetchMore } = useQuery(GetRowsConnection.Document, {
     variables: {
       offset: 0,
       limit: 10, //todo, pass in
     },
   });
 
-  if (loading && !data.getRowPage) {
+  if (loading && !data.getRowsConnection) {
     return {
       loading: true,
       rows: [],
       loadMore: undefined,
       hasNextRow: true,
+      totalRows: 0,
     };
   }
 
-  const loadMore = (offset: number, limit: number) => {
+  const loadMore = (offset: number) => {
     return fetchMore({
-      query: GetRowPage.Document,
+      query: GetRowsConnection.Document,
       variables: {
         offset,
-        limit,
+        limit: args.limit,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) return prev;
-        return immer.produce(prev, (draft: GetRowPage.Query) => {
-          draft.getRowPage.rows.push(...fetchMoreResult.getRowPage.rows);
-          draft.getRowPage.pageInfo.hasNextRow =
-            fetchMoreResult.getRowPage.pageInfo.hasNextRow;
+        return immer.produce(prev, (draft: GetRowsConnection.Query) => {
+          draft.getRowsConnection.rows.push(
+            ...fetchMoreResult.getRowsConnection.rows
+          );
+          draft.getRowsConnection.pageInfo.hasNextRow =
+            fetchMoreResult.getRowsConnection.pageInfo.hasNextRow;
         });
       },
     });
   };
 
   return {
-    rows: data.getRowPage.rows,
+    rows: data.getRowsConnection.rows,
     loading: false,
-    hasNextRow: data.getRowPage.pageInfo.hasNextRow,
+    hasNextRow: data.getRowsConnection.pageInfo.hasNextRow,
+    totalRows: data.getRowsConnection.totalRows,
     loadMore,
   };
 }

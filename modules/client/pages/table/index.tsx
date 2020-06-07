@@ -36,7 +36,7 @@ export const TablePage: React.FC = () => {
   // todo, eventually this will have to be more eleaborate
   // const [offset, setOffset] = React.useState(0);
   // neesd to be configured to match w/ the infinite scroll limit
-  const LIMIT = 10;
+  const limit = 10;
 
   // const rowData = useQueryWithPreviousResultsWhileLoading(GetRows, {
   //   variables: {
@@ -47,7 +47,7 @@ export const TablePage: React.FC = () => {
   // });
   // console.log({ rowData });
 
-  const { rows, loading, loadMore, hasNextRow } = useRows();
+  const { rows, loading, loadMore, hasNextRow, totalRows } = useRows({ limit });
 
   // use-callbackify this
   let loadMoreItems = async (
@@ -57,7 +57,7 @@ export const TablePage: React.FC = () => {
     // setOffset(stopIndex);
     console.log({ stopIndex });
     if (!loading && loadMore) {
-      await loadMore(stopIndex, LIMIT);
+      await loadMore(stopIndex);
     }
     return Promise.resolve();
   };
