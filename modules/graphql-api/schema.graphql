@@ -3,11 +3,15 @@ scalar IsoTime
 
 type Query {
   loggedInUser: User!
-  getRows(limit: Int!, offset: Int!): RowChunk
+  getRowPage(limit: Int!, offset: Int!): Page!
 }
 
-type RowChunk {
+type Page {
   rows: [Row!]!
+  pageInfo: PageInfo!
+}
+
+type PageInfo {
   hasNextRow: Boolean!
 }
 

@@ -18,13 +18,17 @@ const loggedInUser: QueryResolvers.LoggedInUserResolver<
   return await context.getCurrentUser();
 };
 
-const getRows: QueryResolvers.GetRowsResolver = async (parent, args, ctx) => {
+const getRowPage: QueryResolvers.GetRowPageResolver = async (
+  parent,
+  args,
+  ctx
+) => {
   const end = args.offset + args.limit;
   const rows = fakedOutRows.slice(args.offset, end);
-  return { rows, hasNextRow: end < fakedOutRows.length };
+  return { rows, pageInfo: { hasNextRow: end < fakedOutRows.length } };
 };
 
 export default {
   loggedInUser,
-  getRows,
+  getRowPage,
 };

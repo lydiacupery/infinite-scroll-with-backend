@@ -1,0 +1,15 @@
+query GetRowPage($limit: Int!, $offset: Int!) {
+  getRowPage(limit: $limit, offset: $offset) {
+    rows {
+      id
+      firstName
+      lastName
+      suffix
+      job
+      index
+    }
+    pageInfo {
+      hasNextRow
+    }
+  }
+}

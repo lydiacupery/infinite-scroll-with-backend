@@ -1,6 +1,8 @@
 import { useQuery } from "react-apollo-hooks";
-import { GetRows } from "client/graphql/types.gen";
+import { GetRowPage } from "client/graphql/types.gen";
 import { ApolloQueryResult } from "apollo-client";
+import { ProvidedRequiredArgumentsOnDirectives } from "graphql/validation/rules/ProvidedRequiredArguments";
+import * as immer from "immer";
 
 export function useRows():
   | { loading: true; rows: never[]; loadMore: undefined; hasNextRow: true }
@@ -13,14 +15,14 @@ export function useRows():
       ) => Promise<ApolloQueryResult<any>>;
       hasNextRow: boolean;
     } {
-  const { data, loading, fetchMore } = useQuery(GetRows.Document, {
+  const { data, loading, fetchMore } = useQuery(GetRowPage.Document, {
     variables: {
       offset: 0,
       limit: 10, //todo, pass in
     },
   });
 
-  if (loading && !data.getRows) {
+  if (loading && !data.getRowPage) {
     return {
       loading: true,
       rows: [],
@@ -31,32 +33,26 @@ export function useRows():
 
   const loadMore = (offset: number, limit: number) => {
     return fetchMore({
-      query: GetRows.Document,
+      query: GetRowPage.Document,
       variables: {
         offset,
         limit,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) return prev;
-        return {
-          // todo, use immer!
-          ...prev,
-          getRows: {
-            ...prev.getRows,
-            rows: [...prev.getRows.rows, ...fetchMoreResult.getRows.rows],
-            hasNextRow: fetchMoreResult.getRows.hasNextRow,
-          },
-        };
+        return immer.produce(prev, (draft: GetRowPage.Query) => {
+          draft.getRowPage.rows.push(...fetchMoreResult.getRowPage.rows);
+          draft.getRowPage.pageInfo.hasNextRow =
+            fetchMoreResult.getRowPage.pageInfo.hasNextRow;
+        });
       },
     });
   };
 
-  // console.log("rows....", data.getRows);
-
   return {
-    rows: data.getRows.rows,
+    rows: data.getRowPage.rows,
     loading: false,
-    hasNextRow: data.getRows.hasNextRow,
+    hasNextRow: data.getRowPage.pageInfo.hasNextRow,
     loadMore,
   };
 }
