@@ -1,8 +1,9 @@
-import { useQuery } from "react-apollo-hooks";
 import { GetRowsConnection } from "client/graphql/types.gen";
 import { ApolloQueryResult } from "apollo-client";
 import { ProvidedRequiredArgumentsOnDirectives } from "graphql/validation/rules/ProvidedRequiredArguments";
 import * as immer from "immer";
+import { useState } from "react";
+import { useQuery } from "react-apollo-hooks";
 
 export function useRows(args: {
   limit: number;
@@ -12,21 +13,21 @@ export function useRows(args: {
       rows: never[];
       loadMore: undefined;
       hasNextRow: true;
-      totalRows: 0;
+      totalCount: 0;
     }
   | {
-      loading: false;
+      loading: boolean;
       rows: any[]; // todo add the type!
       loadMore: (offset: number) => Promise<ApolloQueryResult<any>>;
       hasNextRow: boolean;
-      totalRows: number;
+      totalCount: number;
     } {
   const { data, loading, fetchMore } = useQuery(GetRowsConnection.Document, {
     variables: {
-      offset: 0,
-      limit: 10, //todo, pass in
-    },
+      limit: args.limit,
+    } as GetRowsConnection.Variables,
   });
+  const [cursor, setCursor] = useState(undefined);
 
   if (loading && !data.getRowsConnection) {
     return {
@@ -34,7 +35,7 @@ export function useRows(args: {
       rows: [],
       loadMore: undefined,
       hasNextRow: true,
-      totalRows: 0,
+      totalCount: 0,
     };
   }
 
@@ -42,17 +43,21 @@ export function useRows(args: {
     return fetchMore({
       query: GetRowsConnection.Document,
       variables: {
-        offset,
+        startCursor: data.getRowsConnection.pageInfo.endCursor,
+        // startCursor: cursor,
         limit: args.limit,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
-        if (!fetchMoreResult) return prev;
+        if (!fetchMoreResult) {
+          return prev;
+        }
+        setCursor(fetchMoreResult.getRowsConnection.pageInfo.endCursor);
         return immer.produce(prev, (draft: GetRowsConnection.Query) => {
           draft.getRowsConnection.rows.push(
             ...fetchMoreResult.getRowsConnection.rows
           );
-          draft.getRowsConnection.pageInfo.hasNextRow =
-            fetchMoreResult.getRowsConnection.pageInfo.hasNextRow;
+          draft.getRowsConnection.pageInfo =
+            fetchMoreResult.getRowsConnection.pageInfo;
         });
       },
     });
@@ -60,9 +65,9 @@ export function useRows(args: {
 
   return {
     rows: data.getRowsConnection.rows,
-    loading: false,
+    loading: loading,
     hasNextRow: data.getRowsConnection.pageInfo.hasNextRow,
-    totalRows: data.getRowsConnection.totalRows,
+    totalCount: data.getRowsConnection.totalCount,
     loadMore,
   };
 }

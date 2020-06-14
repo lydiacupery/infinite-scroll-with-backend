@@ -1,6 +1,7 @@
 import { QueryResolvers } from "graphql-api/server-types.gen";
 import { MinimalUser } from "./user";
 import * as faker from "faker";
+import { keyBy } from "lodash-es";
 
 faker.seed(123);
 const fakedOutRows = new Array(100).fill(true).map((_, i) => ({
@@ -11,6 +12,8 @@ const fakedOutRows = new Array(100).fill(true).map((_, i) => ({
   job: faker.name.jobDescriptor(),
   index: i,
 }));
+
+const rowIdToRow = keyBy(fakedOutRows, "id");
 
 const loggedInUser: QueryResolvers.LoggedInUserResolver<
   Promise<MinimalUser>
@@ -23,11 +26,17 @@ const getRowsConnection: QueryResolvers.GetRowsConnectionResolver = async (
   args,
   ctx
 ) => {
-  const end = args.offset + args.limit;
-  const rows = fakedOutRows.slice(args.offset, end);
+  const startIndex = args.startCursor ? rowIdToRow[args.startCursor].index : 0;
+  const end = startIndex + args.limit;
+  const endIndex = end < fakedOutRows.length ? end : fakedOutRows.length - 1;
+  const rows = fakedOutRows.slice(startIndex, end);
   return {
     rows,
-    pageInfo: { hasNextRow: end < fakedOutRows.length },
+    pageInfo: {
+      hasNextRow: endIndex < fakedOutRows.length,
+      startCursor: fakedOutRows[startIndex].id,
+      endCursor: fakedOutRows[endIndex].id,
+    },
     totalCount: fakedOutRows.length,
   };
 };

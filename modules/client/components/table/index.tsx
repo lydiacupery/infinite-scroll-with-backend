@@ -53,6 +53,7 @@ type Props = {
     columnIndex: number;
   };
   setScrollRowAndColumn: (rowIndex: number, columnIndex: number) => void;
+  totalCount: number;
 };
 
 export const Table: React.FunctionComponent<Props> = props => {
@@ -63,6 +64,7 @@ export const Table: React.FunctionComponent<Props> = props => {
     isItemLoaded,
     scrollState,
     setScrollRowAndColumn,
+    totalCount,
   } = props;
 
   const itemCount = hasNextPage ? items.length + 1 : items.length;
@@ -72,7 +74,6 @@ export const Table: React.FunctionComponent<Props> = props => {
     data: items,
     columns: columns,
   });
-  console.log({ rows });
 
   const itemData: ItemData = React.useMemo(
     () => ({
@@ -89,7 +90,7 @@ export const Table: React.FunctionComponent<Props> = props => {
       isItemLoaded={isItemLoaded}
       scrollState={scrollState}
       setScrollRowAndColumn={setScrollRowAndColumn}
-      itemCount={itemCount}
+      itemCount={totalCount}
       itemData={itemData}
       columnCount={columns.length}
     />

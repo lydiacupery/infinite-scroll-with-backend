@@ -6,7 +6,6 @@ import {
   ROW_HEIGHT,
   TABLE_HEIGHT,
   TABLE_WIDTH,
-  ITEMS_TO_LOAD_COUNT,
 } from "./constants";
 import { Item, ItemData } from "./Item";
 import { InfiniteLoader } from "./infinite-loader";

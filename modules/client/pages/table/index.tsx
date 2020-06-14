@@ -1,13 +1,11 @@
 import * as React from "react";
 import * as Faker from "faker";
 import { Button, Typography, Grid } from "@material-ui/core";
-import { ITEMS_TO_LOAD_COUNT } from "client/components/table/constants";
 import { Table } from "client/components/table";
 import {
   useQueryBundle,
   useQueryWithPreviousResultsWhileLoading,
 } from "client/graphql/hooks";
-import { GetRows } from "client/graphql/types.gen";
 import { useRows } from "./useRows";
 
 export type ItemType = {
@@ -47,15 +45,15 @@ export const TablePage: React.FC = () => {
   // });
   // console.log({ rowData });
 
-  const { rows, loading, loadMore, hasNextRow, totalRows } = useRows({ limit });
+  const { rows, loading, loadMore, hasNextRow, totalCount } = useRows({
+    limit,
+  });
 
   // use-callbackify this
   let loadMoreItems = async (
     startIndex: number,
     stopIndex: number
   ): Promise<any> => {
-    // setOffset(stopIndex);
-    console.log({ stopIndex });
     if (!loading && loadMore) {
       await loadMore(stopIndex);
     }
@@ -65,7 +63,11 @@ export const TablePage: React.FC = () => {
   // the item is loaded if either 1) there are no more pages or 2) there exists an item at that index
   let isItemLoaded = (index: number) =>
     // !loadedItemsState.hasNextPage || !!loadedItemsState.items[index];
-    !hasNextRow || !!rows[index]; // todo, account for 'has next page'
+    {
+      /* !loadedItemsState.hasNextPage || !!loadedItemsState.items[index];*/
+      console.log("is index loaded? ", index, !hasNextRow || !!rows[index]);
+      return !hasNextRow || !!rows[index];
+    }; // todo, account for 'has next page'
 
   const setScrollRowAndColum = React.useCallback(
     (rowIndex: number, columnIndex: number) => {
@@ -113,6 +115,7 @@ export const TablePage: React.FC = () => {
           isItemLoaded={isItemLoaded}
           scrollState={scrollState}
           setScrollRowAndColumn={setScrollRowAndColum}
+          totalCount={totalCount}
         />
       </Grid>
     </>

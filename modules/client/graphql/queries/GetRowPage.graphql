@@ -1,5 +1,5 @@
-query GetRowsConnection($limit: Int!, $offset: Int!) {
-  getRowsConnection(limit: $limit, offset: $offset) {
+query GetRowsConnection($limit: Int!, $startCursor: ID) {
+  getRowsConnection(limit: $limit, startCursor: $startCursor) {
     rows {
       id
       firstName
@@ -10,6 +10,8 @@ query GetRowsConnection($limit: Int!, $offset: Int!) {
     }
     pageInfo {
       hasNextRow
+      startCursor
+      endCursor
     }
     totalCount
   }
