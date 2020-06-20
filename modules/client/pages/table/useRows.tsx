@@ -5,53 +5,58 @@ import * as immer from "immer";
 import { useState } from "react";
 import { useQuery } from "react-apollo-hooks";
 
-export function useRows(args: {
-  limit: number;
-}):
+type Row = {
+  id: string;
+  index: number;
+  firstName: string;
+  lastName: string;
+  suffix: string;
+  job: string;
+};
+type UseRowsResponse =
   | {
       loading: true;
       rows: never[];
       loadMore: undefined;
-      hasNextRow: true;
+      hasNextRow: false;
       totalCount: 0;
     }
   | {
       loading: boolean;
-      rows: any[]; // todo add the type!
-      loadMore: (offset: number) => Promise<ApolloQueryResult<any>>;
+      rows: Row[];
+      loadMore: (offset: number) => Promise<void>;
       hasNextRow: boolean;
       totalCount: number;
-    } {
+    };
+
+export function useRows(args: { limit: number }): UseRowsResponse {
   const { data, loading, fetchMore } = useQuery(GetRowsConnection.Document, {
     variables: {
       limit: args.limit,
     } as GetRowsConnection.Variables,
   });
-  const [cursor, setCursor] = useState(undefined);
 
   if (loading && !data.getRowsConnection) {
     return {
       loading: true,
       rows: [],
       loadMore: undefined,
-      hasNextRow: true,
+      hasNextRow: false,
       totalCount: 0,
     };
   }
 
-  const loadMore = (offset: number) => {
-    return fetchMore({
+  const loadMore = async (offset: number) => {
+    await fetchMore({
       query: GetRowsConnection.Document,
       variables: {
         startCursor: data.getRowsConnection.pageInfo.endCursor,
-        // startCursor: cursor,
         limit: args.limit,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) {
           return prev;
         }
-        setCursor(fetchMoreResult.getRowsConnection.pageInfo.endCursor);
         return immer.produce(prev, (draft: GetRowsConnection.Query) => {
           draft.getRowsConnection.rows.push(
             ...fetchMoreResult.getRowsConnection.rows

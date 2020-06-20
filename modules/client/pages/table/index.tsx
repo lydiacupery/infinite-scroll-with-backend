@@ -49,25 +49,23 @@ export const TablePage: React.FC = () => {
     limit,
   });
 
-  // use-callbackify this
-  let loadMoreItems = async (
-    startIndex: number,
-    stopIndex: number
-  ): Promise<any> => {
-    if (!loading && loadMore) {
-      await loadMore(stopIndex);
-    }
-    return Promise.resolve();
-  };
+  let loadMoreItems = React.useCallback(
+    async (startIndex: number, stopIndex: number) => {
+      if (!loading && loadMore) {
+        await loadMore(stopIndex);
+      }
+      return Promise.resolve();
+    },
+    [loadMore]
+  );
 
   // the item is loaded if either 1) there are no more pages or 2) there exists an item at that index
-  let isItemLoaded = (index: number) =>
-    // !loadedItemsState.hasNextPage || !!loadedItemsState.items[index];
-    {
-      /* !loadedItemsState.hasNextPage || !!loadedItemsState.items[index];*/
-      console.log("is index loaded? ", index, !hasNextRow || !!rows[index]);
+  let isItemLoaded = React.useCallback(
+    (index: number) => {
       return !hasNextRow || !!rows[index];
-    }; // todo, account for 'has next page'
+    },
+    [hasNextRow, rows]
+  );
 
   const setScrollRowAndColum = React.useCallback(
     (rowIndex: number, columnIndex: number) => {
