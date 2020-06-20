@@ -19,15 +19,11 @@ const columns: Column<ItemType>[] = [
         Header: "Suffix",
         accessor: "suffix",
       },
-      {
-        Header: "Index",
-        accessor: "index",
-      },
     ],
   },
   {
     Header: "Job",
-    accessor: "job",
+    accessor: "jobTitle",
   },
 ];
 
@@ -35,8 +31,8 @@ export type ItemType = {
   firstName: string;
   lastName: string;
   suffix: string;
-  job: string;
-  index: number;
+  jobTitle: string;
+  id: string;
 };
 
 type Props = {

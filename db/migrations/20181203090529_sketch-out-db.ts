@@ -7,7 +7,8 @@ exports.up = async function(knex: Knex): Promise<any> {
     table.string("firstName");
     table.string("lastName");
     table.string("suffix");
-    table.string("job");
+    table.string("jobTitle");
+    table.dateTime("createdAt");
   });
 };
 

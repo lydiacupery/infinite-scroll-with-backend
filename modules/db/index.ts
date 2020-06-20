@@ -1,4 +1,5 @@
 import * as config from "config";
+import * as DateTimeIso from "core/date-time-iso";
 const env = config.get<string>("environment");
 
 const knexConfig: any = require("../../knexfile")[env];
@@ -18,6 +19,21 @@ export async function destroyConnection() {
   }
 }
 
+// https://github.com/WhoopInc/node-pg-range/blob/master/lib/parser.js
+const oids = {
+  BigInt: 20,
+  Numeric: 1700,
+  Integer: 23,
+  Int4Range: 3904,
+  Int8Range: 3926,
+  NumRange: 3906,
+  TimestampRange: 3908,
+  TimestampWithTimezoneRange: 3910,
+  DateRange: 3912,
+  Date: 1082,
+  TimestampWithTimezone: 1184,
+};
+
 export function getConnection() {
   if (!$connection) {
     /*
@@ -33,7 +49,13 @@ export function getConnection() {
 
      */
     var pgTypes = require("pg").types;
-    pgTypes.setTypeParser(1082, (val: string) => val);
+    pgTypes.setTypeParser(oids.Date, (val: string) => val);
+    pgTypes.setTypeParser(oids.Numeric, parseFloat);
+    pgTypes.setTypeParser(oids.BigInt, parseFloat);
+    pgTypes.setTypeParser(
+      oids.TimestampWithTimezone,
+      DateTimeIso.toIsoDateTime
+    );
 
     $connection = knex(knexConfig);
   }

@@ -1,6 +1,6 @@
 import { RepositoriesBase } from "atomic-object/records";
-import { UserRepository } from "./user";
+import { EmployeeRepository } from "./employee";
 
 export class Repositories extends RepositoriesBase {
-  users = new UserRepository(this);
+  employees = new EmployeeRepository(this);
 }

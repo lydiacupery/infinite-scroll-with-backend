@@ -5,8 +5,7 @@ query GetRowsConnection($limit: Int!, $startCursor: ID) {
       firstName
       lastName
       suffix
-      job
-      index
+      jobTitle
     }
     pageInfo {
       hasNextRow

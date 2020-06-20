@@ -2,7 +2,6 @@ scalar IsoDate
 scalar IsoTime
 
 type Query {
-  loggedInUser: User!
   getRowsConnection(limit: Int!, startCursor: ID): RowsConnection!
 }
 
@@ -14,23 +13,16 @@ type RowsConnection {
 
 type PageInfo {
   hasNextRow: Boolean!
-  startCursor: ID!
-  endCursor: ID!
+  startCursor: ID
+  endCursor: ID
 }
 
 type Row {
   id: ID!
-  index: Int!
   firstName: String!
   lastName: String!
   suffix: String!
-  job: String!
-}
-
-type User {
-  id: Int!
-  firstName: String!
-  lastName: String!
+  jobTitle: String!
 }
 
 type Mutation {

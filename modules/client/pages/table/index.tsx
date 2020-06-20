@@ -12,7 +12,8 @@ export type ItemType = {
   firstName: string;
   lastName: string;
   suffix: string;
-  job: string;
+  jobTitle: string;
+  id: string;
 };
 
 export const TablePage: React.FC = () => {

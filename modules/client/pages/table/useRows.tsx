@@ -4,15 +4,8 @@ import { ProvidedRequiredArgumentsOnDirectives } from "graphql/validation/rules/
 import * as immer from "immer";
 import { useState } from "react";
 import { useQuery } from "react-apollo-hooks";
+import { ItemType } from ".";
 
-type Row = {
-  id: string;
-  index: number;
-  firstName: string;
-  lastName: string;
-  suffix: string;
-  job: string;
-};
 type UseRowsResponse =
   | {
       loading: true;
@@ -23,7 +16,7 @@ type UseRowsResponse =
     }
   | {
       loading: boolean;
-      rows: Row[];
+      rows: ItemType[];
       loadMore: (offset: number) => Promise<void>;
       hasNextRow: boolean;
       totalCount: number;

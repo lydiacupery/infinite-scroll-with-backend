@@ -1,47 +1,42 @@
 import { QueryResolvers } from "graphql-api/server-types.gen";
-import { MinimalUser } from "./user";
 import * as faker from "faker";
 import { keyBy } from "lodash-es";
 
-faker.seed(123);
-const fakedOutRows = new Array(100).fill(true).map((_, i) => ({
-  id: faker.random.uuid(),
-  firstName: faker.name.firstName(),
-  lastName: faker.name.lastName(),
-  suffix: faker.name.suffix(),
-  job: faker.name.jobDescriptor(),
-  index: i,
-}));
+// faker.seed(123);
+// const fakedOutRows = new Array(100).fill(true).map((_, i) => ({
+//   id: faker.random.uuid(),
+//   firstName: faker.name.firstName(),
+//   lastName: faker.name.lastName(),
+//   suffix: faker.name.suffix(),
+//   job: faker.name.jobDescriptor(),
+//   index: i,
+// }));
 
-const rowIdToRow = keyBy(fakedOutRows, "id");
-
-const loggedInUser: QueryResolvers.LoggedInUserResolver<
-  Promise<MinimalUser>
-> = async (parent, args, context, info) => {
-  return await context.getCurrentUser();
-};
+// const rowIdToRow = keyBy(fakedOutRows, "id");
 
 const getRowsConnection: QueryResolvers.GetRowsConnectionResolver = async (
   parent,
   args,
   ctx
 ) => {
-  const startIndex = args.startCursor ? rowIdToRow[args.startCursor].index : 0;
-  const end = startIndex + args.limit;
-  const endIndex = end < fakedOutRows.length ? end : fakedOutRows.length - 1;
-  const rows = fakedOutRows.slice(startIndex, end);
+  const totalCount = ctx.repos.employees.count();
+  const rows = await ctx.repos.employees.rows({
+    ...(args.startCursor && { cursor: args.startCursor }),
+    limit: args.limit + 1,
+  });
+  console.log({ rows });
+
   return {
-    rows,
+    rows: rows.slice(0, args.limit),
     pageInfo: {
-      hasNextRow: endIndex < fakedOutRows.length,
-      startCursor: fakedOutRows[startIndex].id,
-      endCursor: fakedOutRows[endIndex].id,
+      hasNextRow: rows.length === args.limit + 1, // there is a row after the current
+      startCursor: rows[0] && rows[0].id,
+      endCursor: rows[rows.length] && rows[rows.length - 1].id,
     },
-    totalCount: fakedOutRows.length,
+    totalCount,
   };
 };
 
 export default {
-  loggedInUser,
   getRowsConnection,
 };

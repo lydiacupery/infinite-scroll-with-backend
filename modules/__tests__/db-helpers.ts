@@ -5,7 +5,7 @@ import { Context } from "graphql-api/context";
 import * as uuid from "uuid";
 import { getRedisConnection } from "db/redis";
 import * as Blueprints from "atomic-object/blueprints";
-import { SavedUser } from "records/user";
+import { SavedEmployee } from "records/employee";
 import { JobRunner } from "atomic-object/jobs/mapping";
 
 export function withTransactionalConnection(
@@ -33,11 +33,11 @@ export function withTransactionalConnection(
 
 type ContextFn = (
   context: Context,
-  extra: { universe: Blueprints.Universe; user: SavedUser | null }
+  extra: { universe: Blueprints.Universe; user: SavedEmployee | null }
 ) => void | any;
 type WithContextArgs = {
   initialState?: Partial<ClientState>;
-  userScenario?: (universe: Blueprints.Universe) => Promise<SavedUser>;
+  userScenario?: (universe: Blueprints.Universe) => Promise<SavedEmployee>;
   run: ContextFn;
 };
 
@@ -64,7 +64,7 @@ export function withContext(
 
     const universe = new Blueprints.Universe(context);
 
-    let user: SavedUser | null = null;
+    let user: SavedEmployee | null = null;
     if (args.userScenario) {
       user = await args.userScenario(universe);
       context.userId = user.id;

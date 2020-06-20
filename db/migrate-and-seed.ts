@@ -15,7 +15,7 @@ export const migrateAndSeed = async () => {
     }
   }
 
-  spawn.sync("yarn", ["run", "db:migrate:latest:dev"], { stdio: "inherit" });
+  spawn.sync("yarn", ["run", "db:migrate:latest"], { stdio: "inherit" });
 
   if (process.env.USE_FAKE_DATA) {
     // && process.env.NODE_ENV == "production") {
