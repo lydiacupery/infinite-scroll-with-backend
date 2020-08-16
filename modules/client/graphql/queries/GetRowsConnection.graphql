@@ -1,0 +1,17 @@
+query GetRowsConnection($limit: Int!, $startCursor: ID) {
+  getRowsConnection(limit: $limit, startCursor: $startCursor) {
+    rows {
+      id
+      firstName
+      lastName
+      suffix
+      jobTitle
+    }
+    pageInfo {
+      hasNextRow
+      startCursor
+      endCursor
+    }
+    totalCount
+  }
+}

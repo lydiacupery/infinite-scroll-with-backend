@@ -1,4 +1,6 @@
 import { recordInfo } from "atomic-object/records";
-import { SavedUser, UnsavedUser } from "../user";
+import { SavedEmployee, UnsavedEmployee } from "../employee";
 
-export const UserRecord = recordInfo<UnsavedUser, SavedUser>("User");
+export const EmployeeRecord = recordInfo<UnsavedEmployee, SavedEmployee>(
+  "Employee"
+);

@@ -11,7 +11,7 @@ import { graphiqlExpress, graphqlExpress } from "graphql-server-express";
 import { sortBy } from "lodash-es";
 import * as morgan from "morgan";
 import * as passport from "passport";
-import { SavedUser } from "records/user";
+import { SavedEmployee } from "records/employee";
 import { migrateAndSeed } from "../../db/migrate-and-seed";
 import * as db from "../db";
 import { buildContext } from "./context";

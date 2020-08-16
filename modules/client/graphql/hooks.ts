@@ -6,9 +6,10 @@ import {
   FetchMoreQueryOptions,
   FetchMoreOptions,
 } from "apollo-client";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { MutationFn } from "react-apollo";
 import { Omit } from "helpers";
+import { flow } from "lodash-es";
 
 type NonOptional<O> = O extends null | undefined | (infer T) ? T : O;
 
@@ -59,6 +60,34 @@ export function useQueryBundle<Result, Vars>(
 
   return ourResult;
 }
+
+export function usePreviousResultWhileLoading<R, V>(
+  queryResult: PlacementQueryHookResult<R, V>
+): PlacementQueryHookResult<R, V> {
+  const data = useRef<null | typeof queryResult>(null);
+  if (queryResult.state === "LOADING" && !data.current) {
+    return queryResult;
+  }
+  if (!data.current || queryResult.state === "DONE") {
+    data.current = queryResult;
+  }
+  if (data.current.state === "LOADING") {
+    // https://github.com/AmwayCorp/fusion-platform/issues/168
+    // This should work, but the types are unhappy...
+    // Ideally, this state should change to "Updating" to better represent the state of having cached values but getting new up to date values
+    // return {
+    //   ...data.current,
+    //   state: "UPDATING",
+    // };
+    return data.current;
+  }
+  return data.current;
+}
+
+export const useQueryWithPreviousResultsWhileLoading = flow(
+  useQueryBundle,
+  usePreviousResultWhileLoading
+);
 
 export function useMutationBundle<T, TVariables>(
   mutation: GraphqlBundle<T, TVariables>,

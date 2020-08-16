@@ -11,9 +11,8 @@ export type TimeSet = {
   startTime: Type;
   endTime: Type;
 };
-export function isValid(t: any): t is Type {
-  return VALID_REGEX.test(t);
-}
+export const isValid = (t: unknown): t is Type =>
+  typeof t === "string" && VALID_REGEX.test(t);
 
 export function getDuration(timeSet: TimeSet): number {
   return DateFns.differenceInMinutes(
@@ -37,7 +36,7 @@ export function toMinutes(input: Type): string {
   return DateFns.format(parse(input), "mm");
 }
 export function parse(input: Type): Date {
-  return DateFns.parse(`2000-01-01T${input}`);
+  return DateFns.parseISO(`2000-01-01T${input}`);
 }
 export function from(
   hours: number = 0,
@@ -55,7 +54,7 @@ export function timeIso(
   literals: TemplateStringsArray,
   ...placeholders: never[]
 ) {
-  if (literals.length != 1) {
+  if (literals.length !== 1) {
     throw new Error("One parameter only, please.");
   }
   const time = literals[0];

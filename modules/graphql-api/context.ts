@@ -8,9 +8,7 @@ import { buildClientLink, ClientState } from "client/graphql/state-link";
 import * as config from "config";
 import { GraphQLSchema } from "graphql";
 import { Repositories } from "records";
-import { UserId, SavedUser } from "records/user";
-import { ALL_SERVICE_ACTIONS, GlobalDispatch } from "services";
-import { Dispatcher } from "atomic-object/cqrs/dispatch";
+import { EmployeeId, SavedEmployee } from "records/employee";
 import { JobQueuer, JobRunner } from "atomic-object/jobs/mapping";
 import * as db from "../db";
 import { executableSchema } from "./index";
@@ -35,7 +33,6 @@ export class Context {
   private _userId: number | null;
   readonly db: db.Knex;
 
-  dispatch: GlobalDispatch;
   repos: Repositories;
   _jobs: undefined | JobQueuer;
 
@@ -57,8 +54,6 @@ export class Context {
         }),
       ]),
     });
-
-    this.dispatch = new Dispatcher(this, ALL_SERVICE_ACTIONS);
 
     this._userId = opts.userId || null;
 
@@ -89,7 +84,7 @@ export class Context {
     return this._jobs;
   }
 
-  get userId(): UserId {
+  get userId(): EmployeeId {
     if (!this._userId) throw new Error("No authenticated user.");
     return this._userId;
   }
@@ -98,7 +93,7 @@ export class Context {
   userId should only be set for testing
   In prod, userId should only be set when creating a new context for a user 
   */
-  set userId(newUserId: UserId) {
+  set userId(newUserId: EmployeeId) {
     //if env does not equal test, throw an error
     if (!__TEST__) {
       throw new Error(
@@ -108,9 +103,9 @@ export class Context {
     this._userId = newUserId;
   }
 
-  async getCurrentUser(): Promise<SavedUser> {
+  async getCurrentUser(): Promise<SavedEmployee> {
     if (!this._userId) throw new Error("No authenticated user.");
-    const user = await this.repos.users.findById.load(this.userId);
+    const user = await this.repos.employees.findById.load(this.userId);
     if (!user) throw new Error("No authenticated user.");
     return user;
   }
