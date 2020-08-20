@@ -2,6 +2,8 @@ import * as React from "react";
 import { Column, useTable } from "react-table";
 import { ItemData } from "./Item";
 import { TableContent } from "./content";
+import * as DateTimeIso from "core/date-time-iso";
+import { ItemType } from "./types";
 
 const columns: Column<ItemType>[] = [
   {
@@ -22,18 +24,15 @@ const columns: Column<ItemType>[] = [
     ],
   },
   {
-    Header: "Job",
+    Header: "Job Title",
     accessor: "jobTitle",
   },
+  {
+    Header: "Date Created",
+    id: "createdAt",
+    accessor: row => DateTimeIso.dateFromTimestamp(row.createdAt),
+  },
 ];
-
-export type ItemType = {
-  firstName: string;
-  lastName: string;
-  suffix: string;
-  jobTitle: string;
-  id: string;
-};
 
 type Props = {
   // are there still more items to load?

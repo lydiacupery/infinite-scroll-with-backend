@@ -22,16 +22,16 @@ const getRowsConnection: QueryResolvers.GetRowsConnectionResolver = async (
   const totalCount = ctx.repos.employees.count();
   const rows = await ctx.repos.employees.rows({
     ...(args.startCursor && { cursor: args.startCursor }),
-    limit: args.limit + 1,
+    limit: args.count + 1,
   });
   console.log({ rows });
 
   return {
-    rows: rows.slice(0, args.limit),
+    rows: rows.slice(0, args.count),
     pageInfo: {
-      hasNextRow: rows.length === args.limit + 1, // there is a row after the current
-      startCursor: rows[0] && rows[0].id,
-      endCursor: rows[rows.length] && rows[rows.length - 1].id,
+      hasNextRow: rows.length === args.count + 1, // there is a row after the current
+      startCursor: rows[0] && rows[0].createdAt,
+      endCursor: rows[args.count] && rows[args.count].createdAt,
     },
     totalCount,
   };

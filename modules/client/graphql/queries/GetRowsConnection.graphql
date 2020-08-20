@@ -1,11 +1,12 @@
-query GetRowsConnection($limit: Int!, $startCursor: ID) {
-  getRowsConnection(limit: $limit, startCursor: $startCursor) {
+query GetRowsConnection($count: Int!, $startCursor: ID) {
+  getRowsConnection(count: $count, startCursor: $startCursor) {
     rows {
       id
       firstName
       lastName
       suffix
       jobTitle
+      createdAt
     }
     pageInfo {
       hasNextRow

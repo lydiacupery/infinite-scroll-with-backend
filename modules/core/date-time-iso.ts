@@ -14,6 +14,10 @@ export const VALID_REGEX = /^(\d{4})-(\d{2})-(\d{2})T\d{2}:\d{2}:\d{2}(\.\d{3})?
 export function timeFromTimestamp(timestamp: string): TimeIso.Type {
   return TimeIso.fromDate(new Date(Date.parse(timestamp)));
 }
+
+export function dateFromTimestamp(timestamp: string): DateIso.Type {
+  return DateIso.toIsoDate(new Date(Date.parse(timestamp)));
+}
 export function toIsoDateTime(dateTime: Date | string): Type {
   dateTime =
     typeof dateTime === "string" ? DateFns.parseISO(dateTime) : dateTime;

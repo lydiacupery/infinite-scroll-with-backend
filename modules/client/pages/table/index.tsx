@@ -8,14 +8,6 @@ import {
 } from "client/graphql/hooks";
 import { useRows } from "./useRows";
 
-export type ItemType = {
-  firstName: string;
-  lastName: string;
-  suffix: string;
-  jobTitle: string;
-  id: string;
-};
-
 export const TablePage: React.FC = () => {
   // const [loadedItemsState, setLoadedItemsState] = React.useState<{
   //   hasNextPage: boolean;
@@ -35,7 +27,7 @@ export const TablePage: React.FC = () => {
   // todo, eventually this will have to be more eleaborate
   // const [offset, setOffset] = React.useState(0);
   // neesd to be configured to match w/ the infinite scroll limit
-  const limit = 10;
+  const count = 10;
 
   // const rowData = useQueryWithPreviousResultsWhileLoading(GetRows, {
   //   variables: {
@@ -47,13 +39,13 @@ export const TablePage: React.FC = () => {
   // console.log({ rowData });
 
   const { rows, loading, loadMore, hasNextRow, totalCount } = useRows({
-    limit,
+    count,
   });
 
   let loadMoreItems = React.useCallback(
     async (startIndex: number, stopIndex: number) => {
       if (!loading && loadMore) {
-        await loadMore(stopIndex);
+        await loadMore();
       }
       return Promise.resolve();
     },

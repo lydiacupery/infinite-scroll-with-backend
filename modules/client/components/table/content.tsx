@@ -59,6 +59,13 @@ export const TableContent: React.FunctionComponent<Props> = props => {
             overscanRowStopIndex,
             overscanRowStartIndex,
           }) => {
+            console.log({
+              visibleRowStartIndex,
+              visibleColumnStartIndex,
+              visibleRowStopIndex,
+              overscanRowStartIndex,
+              overscanRowStopIndex,
+            });
             setScrollRowAndColumn(
               visibleRowStartIndex,
               visibleColumnStartIndex

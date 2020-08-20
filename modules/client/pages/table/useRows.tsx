@@ -4,7 +4,7 @@ import { ProvidedRequiredArgumentsOnDirectives } from "graphql/validation/rules/
 import * as immer from "immer";
 import { useState } from "react";
 import { useQuery } from "react-apollo-hooks";
-import { ItemType } from ".";
+import { ItemType } from "client/components/table/types";
 
 type UseRowsResponse =
   | {
@@ -17,15 +17,15 @@ type UseRowsResponse =
   | {
       loading: boolean;
       rows: ItemType[];
-      loadMore: (offset: number) => Promise<void>;
+      loadMore: () => Promise<void>;
       hasNextRow: boolean;
       totalCount: number;
     };
 
-export function useRows(args: { limit: number }): UseRowsResponse {
+export function useRows(args: { count: number }): UseRowsResponse {
   const { data, loading, fetchMore } = useQuery(GetRowsConnection.Document, {
     variables: {
-      limit: args.limit,
+      count: args.count,
     } as GetRowsConnection.Variables,
   });
 
@@ -39,12 +39,13 @@ export function useRows(args: { limit: number }): UseRowsResponse {
     };
   }
 
-  const loadMore = async (offset: number) => {
+  const loadMore = async () => {
+    console.log("end cursor", data.getRowsConnection.pageInfo.endCursor);
     await fetchMore({
       query: GetRowsConnection.Document,
       variables: {
         startCursor: data.getRowsConnection.pageInfo.endCursor,
-        limit: args.limit,
+        count: args.count,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) {

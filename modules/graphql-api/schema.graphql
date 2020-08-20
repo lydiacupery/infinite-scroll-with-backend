@@ -2,7 +2,7 @@ scalar IsoDate
 scalar IsoTime
 
 type Query {
-  getRowsConnection(limit: Int!, startCursor: ID): RowsConnection!
+  getRowsConnection(count: Int!, startCursor: ID): RowsConnection!
 }
 
 type RowsConnection {
@@ -23,6 +23,7 @@ type Row {
   lastName: String!
   suffix: String!
   jobTitle: String!
+  createdAt: String!
 }
 
 type Mutation {
