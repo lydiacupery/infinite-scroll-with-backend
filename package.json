@@ -133,7 +133,7 @@
     "graphql-server-express": "^1.4.0",
     "graphql-tag": "^2.10.1",
     "graphql-tools": "^4.0.4",
-    "immer": "^6.0.9",
+    "immer": "^9.0.6",
     "ioredis": "^4.6.2",
     "json-stable-stringify": "^1.0.1",
     "knex": "0.16.3",
